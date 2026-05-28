@@ -4,6 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
+8
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
@@ -55,12 +56,6 @@ if __name__ == "__main__":
     transform = sonata.transform.default()
     # Load data
     point = sonata.data.load("sample1")
-    point.pop("segment200")
-    segment = point.pop("segment20")
-    point["segment"] = segment  # two kinds of segment exist in ScanNet, only use one
-    original_coord = point["coord"].copy()
-    point = transform(point)
-
     with torch.inference_mode():
         for key in point.keys():
             if isinstance(point[key], torch.Tensor):
