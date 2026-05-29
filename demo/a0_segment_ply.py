@@ -41,9 +41,9 @@ class SegHead(nn.Module):
 
 
 if __name__ == "__main__":
-    PLY_PATH = "/home/neura_ai/Downloads/meeting_room.ply"        
-    VOXEL_SIZE = 0.04                      # increase if you run out of GPU memory
-    OUTPUT_PATH = "/home/neura_ai/Downloads/output_seg.ply"   
+    PLY_PATH = "/home/neura_ai/Downloads/kitchen.ply"        
+    VOXEL_SIZE = 0.02                      # increase if you run out of GPU memory
+    OUTPUT_PATH = "/home/neura_ai/Downloads/kitchen_seg.ply"   
 
     sonata.utils.set_seed(24525867)
 
