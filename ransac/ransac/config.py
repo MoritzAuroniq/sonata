@@ -12,7 +12,7 @@ DATA_DIR      = PROJECT_ROOT / "data"
 OUTPUTS_DIR   = PROJECT_ROOT / "outputs"
 
 # Default input path (override per-run on the CLI)
-DEFAULT_PLY = DATA_DIR / "meeting_room.ply"
+DEFAULT_PLY = DATA_DIR / "TLS_kitchen.ply"
 
 
 # ── Step 1.5 — Noise removal (statistical outlier) ────────────────
@@ -25,7 +25,7 @@ VOXEL_SIZE = 0.05                    # m   | smaller = more detail, slower
 # ── Step 3 — Plane removal (RANSAC) ───────────────────────────────
 PLANE_DISTANCE_THRESHOLD = 0.02      # m   | how close to count as "on plane"
 PLANE_RANSAC_ITERATIONS  = 1000      #     | candidates tried per pass
-PLANE_MAX_COUNT          = 5         #     | how many planes to peel off
+PLANE_MAX_COUNT          = 6         #     | how many planes to peel off
 HORIZONTAL_NORMAL_THRESH = 0.9       #     | |normal.y| above this = horizontal
 PLANE_MIN_REMAINING      = 1000      #     | stop if fewer points left
 
@@ -44,4 +44,4 @@ USE_ORIENTED_BBOX  = True            #     | True = OBB, False = AABB
 # ── Up-axis convention ────────────────────────────────────────────
 # Your meeting room scan has Y as the up axis (floor lies in XZ).
 # Change to "Z" if your data is Z-up (standard for most LiDAR).
-UP_AXIS = "Y"
+UP_AXIS = "AUTO"     # was "Y"
