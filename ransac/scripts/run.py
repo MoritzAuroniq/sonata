@@ -2,10 +2,10 @@
 scripts/run.py
 
 CLI entry point. Run from project root:
-
     python scripts/run.py                              # uses DEFAULT_PLY
     python scripts/run.py /path/to/scan.ply            # custom file
     python scripts/run.py /path/to/scan.ply --no-viz   # batch mode (no windows)
+    python scripts/run.py --preset tight               # apply a preset
 """
 
 import sys
@@ -19,34 +19,35 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ransac import pipeline, config
+from ransac.presets import PRESETS, apply_preset
 from ransac.types import save_detections, print_detections_table
-from ransac.visualise import show
+from ransac.visualise import show, show_labeled
 
 
 def snapshot_config(run_dir: Path) -> dict:
-    """Capture all UPPERCASE constants from config.py as a dict and save them."""
+    """Capture all UPPERCASE constants from config.py and save them."""
     params = {
         name: getattr(config, name)
         for name in dir(config)
         if name.isupper() and not name.startswith("_")
     }
-    # Convert any Path objects to strings for JSON
-    params_serialisable = {k: (str(v) if isinstance(v, Path) else v)
-                           for k, v in params.items()}
+    params_serialisable = {
+        k: (str(v) if isinstance(v, Path) else v)
+        for k, v in params.items()
+    }
 
     with open(run_dir / "params.json", "w") as f:
         json.dump(params_serialisable, f, indent=2, default=str)
 
-    # Also keep a copy of the actual config.py for reference
     shutil.copy(Path(config.__file__), run_dir / "config_snapshot.py")
     return params
 
 
 def make_run_dir(input_ply: Path) -> Path:
     """Create outputs/<timestamp>_<input_stem>/ for this run."""
-    stamp     = datetime.now().strftime("%Y%m%d_%H%M%S")
-    stem      = Path(input_ply).stem
-    run_dir   = config.OUTPUTS_DIR / f"{stamp}_{stem}"
+    stamp   = datetime.now().strftime("%Y%m%d_%H%M%S")
+    stem    = Path(input_ply).stem
+    run_dir = config.OUTPUTS_DIR / f"{stamp}_{stem}"
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
 
@@ -59,7 +60,14 @@ def main():
                     help="Skip Open3D windows (batch / headless mode)")
     ap.add_argument("--no-save", action="store_true",
                     help="Do not save any output (default: save everything)")
+    ap.add_argument("--preset", choices=list(PRESETS.keys()), default=None,
+                    help="Apply a parameter preset (default, tight, large). "
+                         "Skip to use config.py as-is.")
     args = ap.parse_args()
+
+    # Apply preset BEFORE pipeline runs so values take effect
+    if args.preset:
+        apply_preset(args.preset, config)
 
     input_path = Path(args.ply_path) if args.ply_path else config.DEFAULT_PLY
 
@@ -74,16 +82,13 @@ def main():
 
     # ── Save outputs ─────────────────────────────────────────────
     if not args.no_save:
-        # 1. JSON detections
         save_detections(detections, run_dir / "detections.json")
-
-        # 2. Parameters used
         snapshot_config(run_dir)
 
-        # 3. Plain-text summary that mirrors what was printed
         with open(run_dir / "summary.txt", "w") as f:
             f.write(f"Input: {input_path}\n")
             f.write(f"Run:   {datetime.now().isoformat(timespec='seconds')}\n")
+            f.write(f"Preset: {args.preset or '(none)'}\n")
             f.write(f"Detected {len(detections)} objects\n\n")
             f.write(f"{'ID':<10}{'X':>8}{'Y':>8}{'Z':>8}    "
                     f"{'W':>6}{'H':>6}{'D':>6}    {'theta':>6}\n")
@@ -97,8 +102,6 @@ def main():
         print(f"[Run] All outputs saved to {run_dir}")
 
     # ── Visualisation ────────────────────────────────────────────
-    from ransac.visualise import show, show_labeled
-    
     if not args.no_viz:
         show_labeled(
             artefacts["clusters"] + artefacts["boxes"] + artefacts["markers"],
