@@ -12,7 +12,7 @@ DATA_DIR      = PROJECT_ROOT / "data"
 OUTPUTS_DIR   = PROJECT_ROOT / "outputs"
 
 # Default input path (override per-run on the CLI)
-DEFAULT_PLY = DATA_DIR / "TLS_kitchen.ply"
+DEFAULT_PLY = DATA_DIR / "meeting_room.ply"
 
 
 # ── Step 1.5 — Noise removal (statistical outlier) ────────────────

@@ -97,19 +97,23 @@ def main():
         print(f"[Run] All outputs saved to {run_dir}")
 
     # ── Visualisation ────────────────────────────────────────────
-    if args.no_viz:
-        return
+    from ransac.visualise import show, show_labeled
+    
+    if not args.no_viz:
+        show_labeled(
+            artefacts["clusters"] + artefacts["boxes"] + artefacts["markers"],
+            detections=detections,
+            title="Step 5 — labeled detections"
+        )
 
-    # Step 5 — clusters + boxes + position markers
-    show(artefacts["clusters"] + artefacts["boxes"] + artefacts["markers"],
-         "Step 5 — objects with OBB + position markers")
-
-    # Step 6 — full scene with all planes (floor, ceiling, walls) + objects
-    # show(artefacts["planes"]
-    #      + artefacts["clusters"]
-    #      + artefacts["boxes"]
-    #      + artefacts["markers"],
-    #      "Step 6 — full scene with planes + objects")
+        show_labeled(
+            artefacts["planes"]
+            + artefacts["clusters"]
+            + artefacts["boxes"]
+            + artefacts["markers"],
+            detections=detections,
+            title="Step 6 — full scene with labels"
+        )
 
 
 if __name__ == "__main__":
