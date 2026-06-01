@@ -36,14 +36,14 @@ PRESETS = {
     # ────────────────────────────────────────────────────────────
     "tight": {
         "SOR_STD_RATIO":            1.5,
-        "VOXEL_SIZE":               0.03,    # finer detail
+        "VOXEL_SIZE":               0.02,    # finer detail for small rooms
         "PLANE_DISTANCE_THRESHOLD": 0.02,
         "PLANE_MAX_COUNT":          6,
-        "DBSCAN_EPS":               0.10,    # was 0.20 — keep close objects separate
-        "DBSCAN_MIN_POINTS":        30,      # was 50  — accept smaller objects
-        "MIN_CLUSTER_DIM":          0.08,    # was 0.15
-        "MAX_CLUSTER_DIM":          3.0,     # was 5.0
-        "MAX_CLUSTER_HEIGHT":       2.5,     # was 3.0
+        "DBSCAN_EPS":               0.10,    # tight clustering — don't merge nearby objects
+        "DBSCAN_MIN_POINTS":        30,
+        "MIN_CLUSTER_DIM":          0.08,    # accept small items
+        "MAX_CLUSTER_DIM":          3.0,
+        "MAX_CLUSTER_HEIGHT":       3.5,     # was 2.5 — this room is 3.96m tall, so allow taller objects
     },
 
     # ────────────────────────────────────────────────────────────
