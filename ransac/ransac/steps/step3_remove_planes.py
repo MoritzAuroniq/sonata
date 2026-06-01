@@ -74,3 +74,15 @@ def drop_ceiling(
     print(f"[Step 6] Ceiling identified at plane index {ceiling_idx} "
           f"({config.UP_AXIS}={plane_info[ceiling_idx][1]:+.2f}m) — removing")
     return [p for i, p in enumerate(plane_clouds) if i != ceiling_idx]
+
+
+def get_floor(plane_clouds, plane_info):
+    """Return the lowest horizontal plane (the floor)."""
+    horizontals = [(i, h) for i, (k, h) in enumerate(plane_info) if k == "horizontal"]
+    if not horizontals:
+        return None, None
+    floor_idx = min(horizontals, key=lambda x: x[1])[0]
+    floor_y   = plane_info[floor_idx][1]
+    print(f"[Step 7] Floor identified at plane index {floor_idx} "
+          f"({config.UP_AXIS}={floor_y:+.2f}m)")
+    return plane_clouds[floor_idx], floor_y

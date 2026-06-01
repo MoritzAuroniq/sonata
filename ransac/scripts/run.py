@@ -100,13 +100,13 @@ def main():
                         f"{w:>6.2f}{h:>6.2f}{dp:>6.2f}    {d.theta_deg:>+6.0f}\n")
 
         print(f"[Run] All outputs saved to {run_dir}")
-
+        
     # ── Visualisation ────────────────────────────────────────────
     if not args.no_viz:
         show_labeled(
             artefacts["clusters"] + artefacts["boxes"] + artefacts["markers"],
             detections=detections,
-            title="Step 5 — labeled detections"
+            title="Step 5 — all detected objects"
         )
 
         show_labeled(
@@ -117,6 +117,16 @@ def main():
             detections=detections,
             title="Step 6 — full scene with labels"
         )
+
+        # Step 7 — floor + ground objects only
+        show_labeled(
+            artefacts["floor"]
+            + artefacts["floor_clusters"]
+            + artefacts["floor_boxes"],
+            detections=artefacts["floor_detections"],
+            title="Step 7 — floor (red) + ground objects (green)"
+        )
+
 
 
 if __name__ == "__main__":

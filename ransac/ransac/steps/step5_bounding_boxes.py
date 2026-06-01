@@ -159,3 +159,37 @@ def make_position_markers(detections):
         )
         markers.append(frame)
     return markers
+
+
+def filter_on_floor(detections, boxes, floor_height: float, tolerance: float = 0.3):
+    """
+    Keep only detections whose bottom sits near the floor.
+    tolerance: how far the box's bottom edge can be above the floor (in metres).
+    """
+    up = _UP_AXIS_INDEX[config.UP_AXIS]
+    kept_detections = []
+    kept_boxes = []
+
+    for det, box in zip(detections, boxes):
+        # The bottom of the box along the up axis
+        ctr_up    = det.centre_xyz_m[up]
+        half_size = det.size_wdh_m[up] / 2
+        box_bottom = ctr_up - half_size
+
+        # Distance from floor to box bottom
+        gap = box_bottom - floor_height
+
+        if gap < -0.1:
+            # Box sits below the floor — probably inside the floor plane noise
+            print(f"  {det.object_id}: rejected (below floor, gap={gap:+.2f}m)")
+            continue
+        if gap > tolerance:
+            # Box floats too far above floor (wall- or ceiling-mounted)
+            print(f"  {det.object_id}: rejected (floating, gap={gap:+.2f}m)")
+            continue
+
+        kept_detections.append(det)
+        kept_boxes.append(box)
+        print(f"  {det.object_id}: kept on floor (gap={gap:+.2f}m)")
+
+    return kept_detections, kept_boxes
